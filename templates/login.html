@@ -1,0 +1,42 @@
+<!Doctype html>
+<html>
+    <head>
+        <title>Quiz Master Login</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body>
+        <div class = "container" id="Main container">
+
+            <!login section>
+            <div class = "container" id="Logincontainer">
+                <h1>Quiz Master Login</h1>
+                <form action = "/" method = "POST" class = "form">
+                    <h1> Sign In </h1>
+                    <label for="username">Email / Admin Username</label><br>
+                    <input type="text" name="username" placeholder="Enter username or Admin Username" required><br>
+                    <lable for = "password">Password</lable><br>
+                    <input type = "password" name = "password" placeholder = "Password" required><br>
+                    <!-- Hidden field to indicate login form -->
+                    <input type="hidden" name="form_type" value="login">
+                    <button class = "btn" id = "submit button" type = "submit">Sign In</button>
+                </form>
+            </div>
+
+            <!signup section>
+            <div class = "container" id="Signupcontainer">
+                <form action = "/" method = "POST" class = "form">
+                    <h1> Sign Up </h1>
+                    <lable for = "firstname">User name</lable><br>
+                    <input type = "text" name = "username" placeholder = "Jhon" required><br>
+                    <lable for = "email">Email</lable><br>
+                    <input type = "email" name = "email" placeholder = "Email" required><br>
+                    <lable for = "password">Password</lable><br>
+                    <input type = "password" name = "password" placeholder = "Password" required><br>
+                    <!-- Hidden field to indicate login form -->
+                    <input type="hidden" name="form_type" value="signup">
+                    <button class = "btn" id = "submit button" type = "submit">Sign Up</button>
+                </form>
+            
+        </div>
+    </body>
+</html>

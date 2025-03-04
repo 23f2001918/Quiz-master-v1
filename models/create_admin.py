@@ -5,17 +5,21 @@ bcrypt = Bcrypt(app)
 
 def create_database():
     with app.app_context():
-        db.create_all()
+        print("Creating database tables...")
+        db.create_all()  # Ensures all tables are created
 
-        # Add a default admin if not exists
-        if not Admin.query.first():
+        # Ensure the Admin table exists and create a default admin
+        admin = Admin.query.first()
+        if not admin:
             hashed_password = bcrypt.generate_password_hash("admin123").decode('utf-8')
             admin = Admin(username="admin", password=hashed_password)
             db.session.add(admin)
             db.session.commit()
-            print("Admin user created with username: admin and password: admin123")
+            print("✅ Admin user created (username: admin, password: admin123)")
+        else:
+            print("⚠️ Admin user already exists.")
 
-        print("Database tables created successfully!")
+        print("✅ Database tables created successfully!")
 
 if __name__ == "__main__":
     create_database()
