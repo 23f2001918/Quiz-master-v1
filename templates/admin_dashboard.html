@@ -1,38 +1,401 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{role.capitalize()}} Dashboard</title>
+    <title>Quiz Master - {{role.capitalize()}} Dashboard</title>
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    <!--style src = "{{ url_for('static', filename='css/admin_dashboard.css') }}"></!--style>
 </head>
 <body>
-    <header>
-        <h1>Dashboard - {{ role.capitalize() }}</h1>
-    </header>
-    <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#profile">Profile</a></li>
-            <li><a href="#settings">Settings</a></li>
-            <li><a href="\">Logout</a></li>
-        </ul>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">Quiz<span>Master</span>{{role.capitalize()}}</div>
+        <div class="navbar-right">
+            <span>{{role.capitalize()}}</span>
+            <button><a class="btn btn-outline" href="{{ url_for('logout') }}">Log Out</a></button>
+        </div>
     </nav>
-    <main>
-        <section id="home">
-            <h2>Home</h2>
-            <p>Welcome to the {{ role }} dashboard!</p>
-        </section>
-        <section id="profile">
-            <h2>Profile</h2>
-            <p>Manage your profile here.</p>
-        </section>
-        <section id="settings">
-            <h2>Settings</h2>
-            <p>Adjust your settings here.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Quiz Master</p>
-    </footer>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#subject-section">Subjects</a></li>
+                <li><a href="#chapter-section">Chapters</a></li>
+                <li><a href="#quizzes-section">Quizzes</a></li>
+                <li><a href="#questions-section">Questions</a></li>
+                <li><a href="#users-section">Users</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Progress Overview -->
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-value">{{total_subjects}}</div>
+                    <div class="progress-label">Total Subjects</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-value">{{total_chapters}}</div>
+                    <div class="progress-label">Total Chapters</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-value">{{total_quizzes}}</div>
+                    <div class="progress-label">Total Quizzes</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-value">{{total_questions}}</div>
+                    <div class="progress-label">Total Questions</div>
+                </div>
+            </div>
+
+            <!-- Subjects Management -->
+            <div class="content-section" id = "subject-section">
+                <div class="section-header">
+                    <h2 class="section-title">Subjects</h2>
+                    <h3 class="create">Create New Subject</h3>
+                    <form action="#" method="POST" class="form">
+                        <lable for = "subjectname">Subject Name</lable><br>
+                        <input type = "text" name = "subjectname" placeholder = "Enter subject name" required><br>
+                        <!-- Hidden field to indicate login form -->
+                        <input type="hidden" name="form_type" value="add_subject">
+                        <button class="btn btn-primary" type="submit">Add Subject</button>
+                    </form>
+                </div>
+                {% if subjects_list == [] %}
+                <div class="empty-list">No subjects found</div>
+                {% endif %}
+                {% if subjects_list != [] %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subject Name</th>
+                            <th>Total Chapters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject in subjects_list %}
+                        <tr>
+                            <td>{{ subject["id"] }}</td>
+                            <td id="name-{{ subject['id'] }}">{{ subject["name"] }}</td>
+                            <td>{{ subject["chapter_count"] }}</td>
+                            <td>
+                                <!-- Edit Button -->
+                                <button class="btn btn-outline" onclick="showEditForm({{ subject['id'] }})">Edit</button>
+                                
+                                <!-- Delete Button -->
+                                 <span>
+                                 <form action="{{ url_for('delete') }}" method="POST">
+                                    <input type="hidden" name="subject_id" value="{{ subject['id'] }}">
+                                    <!-- Hidden field to indicate login form -->
+                                    <input type="hidden" name="form_type" value="subject_delete">
+                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                 </form>
+                                 </span>
+                
+                                <!-- Hidden Edit Form -->
+                                <form id="edit-form-{{ subject['id'] }}" action="{{ url_for('edit') }}" method="POST" style="display: none;">
+                                    <input type="hidden" name="subject_id" value="{{ subject['id'] }}">
+                                    <input type="text" name="new_name" placeholder="Enter new subject name" required>
+                                    <!-- Hidden field to indicate login form -->
+                                    <input type="hidden" name="form_type" value="subject_edit">
+                                    <button type="submit">Save</button>
+                                    <button type="button" onclick="hideEditForm({{ subject['id'] }})">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+            <!-- Chapters Management -->
+            <div class="content-section" id = "chapter-section">
+                <div class="section-header">
+                    <h2 class="section-title">Chapters</h2>
+                    <form action="/admin_dashboard" method="POST">
+                        <label for="subject">Choose a Subject:</label>
+                        <select name="selected_subject" id="subject">
+                            <option value="" disabled selected>Select a Subject</option>
+                            {% for sub in distinct_subject_list %}
+                                <option value="{{ sub }}">{{ sub }}</option>
+                            {% endfor %}
+                        </select>
+                        <!-- Hidden field to indicate the form type -->
+                        <input type="hidden" name="form_type" value="subject_selection_chapter">
+                        <button type="submit">Select subject</button>
+                    </form>
+                </div>
+                {% if chapters_details == [] %}
+                <div class="empty-list">No chapter found for subject {{selected_subject}}</div>
+                {% endif %}
+                {% if chapters_details != [] %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Chapter Name</th>
+                            <th>Total Quizzes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chapter in chapters_details %}
+                        <tr>
+                            <td>{{ chapter["id"] }}</td>
+                            <td id="chapter-name-{{ chapter['id'] }}">{{ chapter["name"] }}</td>
+                            <td>{{ chapter["total_quizzes"] }}</td>
+                            <td>
+                                <!-- Edit Button for Chapter -->
+                                <button class="btn btn-outline" onclick="showEditForm_chapter({{ chapter['id'] }})">Edit</button>
+
+                                <!-- Delete Button for Chapter -->
+                                <form action="{{ url_for('delete') }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="chapter_id" value="{{ chapter['id'] }}">
+                                    <input type="hidden" name="form_type" value="chapter_delete">
+                                    <button class="btn btn-danger" type="submit" onclick="return confirmDelete();">Delete</button>
+                                </form>
+
+                                <!-- Hidden Edit Form for Chapter -->
+                                <form id="edit-form-chapter-{{ chapter['id'] }}" action="{{ url_for('edit') }}" method="POST" style="display: none;">
+                                    <input type="hidden" name="chapter_id" value="{{ chapter['id'] }}">
+                                    <input type="text" name="new_name" placeholder="Enter new chapter name" required>
+                                    <input type="hidden" name="form_type" value="chapter_edit">
+                                    <button type="submit">Save</button>
+                                    <button type="button" onclick="hideEditForm_chapter({{ chapter['id'] }})">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+                <h3 class="create">Create New Chapter for subject {{selected_subject}}</h3>
+                <form action="#" method="POST" class="form">
+                    <label for="chapternamename">Chapter Name</label><br>
+                    <input type="text" name="chaptername" placeholder="Enter chapter name" required><br>
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="form_type" value="add_chapter">
+                    <input type="hidden" name="selected_subject" value="{{selected_subject}}">
+                    <button class="btn btn-primary" type="submit">Add Chapter</button>
+                </form>
+            </div>
+
+            <!-- Quizzes Management -->
+            <div class="content-section" id = "quizzes-section">
+                <div class="section-header">
+                    <h2 class="section-title">Quizzes</h2>
+                    <!-- Form to select a chapter -->
+                    <form action="/admin_dashboard" method="POST">
+                        <label for="chapter">Choose a Chapter:</label>
+                        <select name="selected_chapter" id="chapter">
+                            <option value="" disabled selected>Select a Chapter</option>
+                            {% for chap in distinct_chapter_list %}
+                                <option value="{{ chap }}">{{ chap }}</option>
+                            {% endfor %}
+                        </select>
+                        <!-- Hidden field to indicate the form type for chapter selection -->
+                        <input type="hidden" name="form_type" value="chapter_selection_quiz">
+                        <button type="submit">Select Chapter</button>
+                    </form>
+                </div>
+                
+                <!-- Display message if no quizzes exist for the selected chapter -->
+                {% if quizzes_details == [] %}
+                    <div class="empty-list">No quizzes found for chapter {{ selected_chapter }}</div>
+                {% endif %}
+                
+                <!-- Display quizzes table if there are quizzes -->
+                {% if quizzes_details != [] %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Quiz Name</th>
+                            <th>Total Questions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for quiz in quizzes_details %}
+                        <tr>
+                            <td>{{ quiz["id"] }}</td>
+                            <td id="quiz-name-{{ quiz['id'] }}">{{ quiz["name"] }}</td>
+                            <td>{{ quiz["total_questions"] }}</td>
+                            <td>
+                                <!-- Edit Button for Quiz -->
+                                <button class="btn btn-outline" onclick="showEditForm_quiz({{ quiz['id'] }})">Edit</button>
+
+                                <!-- Delete Button for Quiz -->
+                                <form action="{{ url_for('delete') }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="quiz_id" value="{{ quiz['id'] }}">
+                                    <input type="hidden" name="form_type" value="quiz_delete">
+                                    <button class="btn btn-danger" type="submit" onclick="return confirmDeleteQuiz();">Delete</button>
+                                </form>
+
+                                <!-- Hidden Edit Form for Quiz -->
+                                <form id="edit-form-quiz-{{ quiz['id'] }}" action="{{ url_for('edit') }}" method="POST" style="display: none;">
+                                    <input type="hidden" name="quiz_id" value="{{ quiz['id'] }}">
+                                    <input type="text" name="new_name" placeholder="Enter new quiz name" required>
+                                    <input type="hidden" name="form_type" value="quiz_edit">
+                                    <button type="submit">Save</button>
+                                    <button type="button" onclick="hideEditForm_quiz({{ quiz['id'] }})">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+                
+                <!-- Form to create a new quiz for the selected chapter -->
+                <h3 class="create">Create New Quiz for chapter {{ selected_chapter }}</h3>
+                <form action="/admin_dashboard" method="POST" class="form">
+                    <label for="quizname">Quiz Name</label><br>
+                    <input type="text" name="quizname" placeholder="Enter quiz name" required><br>
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="form_type" value="add_quiz">
+                    <input type="hidden" name="selected_chapter" value="{{ selected_chapter }}">
+                    <button class="btn btn-primary" type="submit">Add Quiz</button>
+                </form>
+            </div>
+
+            <!-- Questions Management Section -->
+            <div class="content-section" id = "questions-section">
+                <div class="section-header">
+                    <h2 class="section-title">Questions</h2>
+                    <!-- Form to select a quiz -->
+                    <form action="/admin_dashboard" method="POST">
+                        <label for="quiz">Choose a Quiz:</label>
+                        <select name="selected_quiz" id="quiz">
+                            <option value="" disabled selected>Select a Quiz</option>
+                            {% for qz in distinct_quiz_list %}
+                                <option value="{{ qz }}">{{ qz }}</option>
+                            {% endfor %}
+                        </select>
+                        <!-- Hidden field to indicate the form type for quiz selection -->
+                        <input type="hidden" name="form_type" value="quiz_selection_question">
+                        <button type="submit">Select Quiz</button>
+                    </form>
+                </div>
+
+                {% if questions_details is defined %}
+                    {% if questions_details == [] %}
+                        <div class="empty-list">No questions found for quiz {{ selected_quiz }}</div>
+                    {% else %}
+                        <p>receaving stuff</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Question</th>
+                                    <th>Option 1</th>
+                                    <th>Option 2</th>
+                                    <th>Option 3</th>
+                                    <th>Option 4</th>
+                                    <th>Answer</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ques in questions_details %}
+                                <tr>
+                                    <td>{{ ques["id"] }}</td>
+                                    <td id="question-{{ ques['id'] }}">{{ ques["question"] }}</td>
+                                    <td>{{ ques["option1"] }}</td>
+                                    <td>{{ ques["option2"] }}</td>
+                                    <td>{{ ques["option3"] }}</td>
+                                    <td>{{ ques["option4"] }}</td>
+                                    <td>{{ ques["answer"] }}</td>
+                                    <td>
+                                        <!-- Edit Button for Question -->
+                                        <button class="btn btn-outline" onclick="showEditForm_question({{ ques['id'] }})">Edit</button>
+
+                                        <!-- Delete Button for Question -->
+                                        <form action="{{ url_for('delete') }}" method="POST" style="display:inline;">
+                                            <input type="hidden" name="question_id" value="{{ ques['id'] }}">
+                                            <input type="hidden" name="form_type" value="question_delete">
+                                            <button class="btn btn-danger" type="submit" onclick="return confirmDeleteQuestion();">Delete</button>
+                                        </form>
+
+                                        <!-- Hidden Edit Form for Question -->
+                                        <form id="edit-form-question-{{ ques['id'] }}" action="{{ url_for('edit') }}" method="POST" style="display:none;">
+                                            <input type="hidden" name="question_id" value="{{ ques['id'] }}">
+                                            <label>Question:</label>
+                                            <input type="text" name="question" value="{{ ques['question'] }}" required><br>
+                                            <label>Option 1:</label>
+                                            <input type="text" name="option1" value="{{ ques['option1'] }}" required><br>
+                                            <label>Option 2:</label>
+                                            <input type="text" name="option2" value="{{ ques['option2'] }}" required><br>
+                                            <label>Option 3:</label>
+                                            <input type="text" name="option3" value="{{ ques['option3'] }}" required><br>
+                                            <label>Option 4:</label>
+                                            <input type="text" name="option4" value="{{ ques['option4'] }}" required><br>
+                                            <label>Answer:</label>
+                                            <input type="text" name="answer" value="{{ ques['answer'] }}" required><br>
+                                            <input type="hidden" name="form_type" value="question_edit">
+                                            <button type="submit">Save</button>
+                                            <button type="button" onclick="hideEditForm_question({{ ques['id'] }})">Cancel</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Form to add a new question -->
+                {% if selected_quiz is defined %}
+                <h3 class="create">Create New Question for Quiz {{ selected_quiz }}</h3>
+                <form action="/admin_dashboard" method="POST" class="form">
+                    <input type="hidden" name="form_type" value="add_question">
+                    <input type="hidden" name="selected_quiz" value="{{ selected_quiz }}">
+                    <label>Question:</label><br>
+                    <input type="text" name="question" placeholder="Enter question" required><br>
+                    <label>Option 1:</label><br>
+                    <input type="text" name="option1" placeholder="Enter option 1" required><br>
+                    <label>Option 2:</label><br>
+                    <input type="text" name="option2" placeholder="Enter option 2" required><br>
+                    <label>Option 3:</label><br>
+                    <input type="text" name="option3" placeholder="Enter option 3" required><br>
+                    <label>Option 4:</label><br>
+                    <input type="text" name="option4" placeholder="Enter option 4" required><br>
+                    <label>Answer:</label><br>
+                    <input type="text" name="answer" placeholder="Enter correct answer" required><br>
+                    <button class="btn btn-primary" type="submit">Add Question</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Users Management -->
+            <div class="content-section" id = "users-section">
+                <div class="section-header">
+                    <h2 class="section-title">Users</h2>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users_list %}
+                        <tr>
+                            <td>{{ user["id"] }}</td>
+                            <td>{{ user["username"] }}</td>
+                            <td>{{ user["email"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>        
 </body>
 </html>

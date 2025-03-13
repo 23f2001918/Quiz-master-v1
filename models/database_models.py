@@ -8,7 +8,7 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, login_
 # Determine the base directory (parent folder of models)
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-app = Flask(__name__, template_folder=os.path.join(basedir, 'templates'))
+app = Flask(__name__, template_folder=os.path.join(basedir, 'templates'),static_folder=os.path.join(basedir, 'static'))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'quiz_master.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'supersecretkey'  # Change this in production
