@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 # Import the app instance along with other objects from your database_models.py
 from models.database_models import app, db, bcrypt, login_manager, User, Admin, subject, chapter, quiz, question, score
 from flask import Flask,session
+import datetime
 
 
 @login_manager.user_loader
@@ -188,11 +189,25 @@ def admin_dashboard():
         elif form_type == "add_quiz":
             selected_chapter = request.form.get("selected_chapter")
             quiz_name = request.form.get("quizname")
-            if quiz_name and selected_chapter:
-                # Assume chapter is uniquely identified by name (or you might pass an ID instead)
+            quiz_start_str = request.form.get("quiz_start")  # e.g., "2025-03-15T09:00"
+            quiz_end_str = request.form.get("quiz_end")      # e.g., "2025-03-15T10:00"
+            
+            if quiz_name and selected_chapter and quiz_start_str and quiz_end_str:
                 chapter_obj = chapter.query.filter_by(name=selected_chapter).first()
                 if chapter_obj:
-                    new_quiz = quiz(name=quiz_name, chapter_id=chapter_obj.id)
+                    try:
+                        # Convert datetime-local string to datetime object.
+                        start_time = datetime.datetime.strptime(quiz_start_str, "%Y-%m-%dT%H:%M")
+                        end_time = datetime.datetime.strptime(quiz_end_str, "%Y-%m-%dT%H:%M")
+                    except ValueError:
+                        flash("Invalid date/time format.", "danger")
+                        return redirect(url_for("admin_dashboard"))
+                    # Ensure start_time is before end_time.
+                    if start_time >= end_time:
+                        flash("Start time must be before end time.", "danger")
+                        return redirect(url_for("admin_dashboard"))
+                    
+                    new_quiz = quiz(name=quiz_name, chapter_id=chapter_obj.id, start_time=start_time, end_time=end_time)
                     db.session.add(new_quiz)
                     db.session.commit()
                     flash("New quiz added successfully", "success")
@@ -200,8 +215,9 @@ def admin_dashboard():
                     flash("Chapter not found!", "danger")
                 return redirect(url_for("admin_dashboard"))
             else:
-                flash("Please enter a quiz name and select a chapter", "danger")
+                flash("Please enter a quiz name, start time, and end time", "danger")
                 return redirect(url_for("admin_dashboard"))
+
         
         elif form_type == "add_question":
             selected_quiz = request.form.get("selected_quiz")
@@ -440,22 +456,24 @@ def user_dashboard():
 @app.route('/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def take_quiz(quiz_id):
-    # Get the quiz object; 404 if not found.
     quiz_obj = quiz.query.get_or_404(quiz_id)
-    print("Quiz object:", quiz_obj)
-    # Retrieve all questions for the quiz.
     questions = question.query.filter_by(quiz_id=quiz_id).all()
+    now = datetime.datetime.now()
     
-    # Set a time limit. For example, if your quiz model has a time_duration field,
-    # you can use that; otherwise, use a default (e.g., 60 seconds per question).
-    time_limit = getattr(quiz_obj, 'time_duration', 60 * len(questions))
+    if now < quiz_obj.start_time:
+        flash("Quiz has not started yet.", "danger")
+        return redirect(url_for("user_dashboard"))
+    if now > quiz_obj.end_time:
+        flash("Quiz attempt period has ended.", "danger")
+        return redirect(url_for("user_dashboard"))
+    
+    # Calculate remaining time in seconds for the quiz timer.
+    time_limit = int((quiz_obj.end_time - now).total_seconds())
     
     if request.method == 'POST':
-        # Evaluate the submitted answers.
         score_val = 0
         feedback = []
         for ques in questions:
-            # Get the submitted answer for question id 'q_{id}'
             selected_answer = request.form.get(f"q_{ques.id}")
             is_correct = (selected_answer == ques.answer)
             if is_correct:
@@ -466,18 +484,11 @@ def take_quiz(quiz_id):
                 "correct": ques.answer,
                 "result": "Correct" if is_correct else "Incorrect"
             })
-            print("Marked for question:", ques.id, "is correct?", is_correct)
-        print("Final score:", score_val)
-        
-        # Store the quiz score in the database.
         new_score = score(score=score_val, user_id=current_user.id, quiz_id=quiz_id)
         db.session.add(new_score)
         db.session.commit()
-        
-        # Render a feedback page with details.
         return render_template("quiz_feedback.html", quiz=quiz_obj, score=score_val, total=len(questions), feedback=feedback)
     
-    # GET: Render the quiz attempt page with the questions and time limit.
     return render_template("take_quiz.html", quiz=quiz_obj, questions=questions, time_limit=time_limit)
 
 @app.route('/quiz_history', methods=['GET'])

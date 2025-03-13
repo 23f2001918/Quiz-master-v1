@@ -256,11 +256,21 @@
                 <form action="/admin_dashboard" method="POST" class="form">
                     <label for="quizname">Quiz Name</label><br>
                     <input type="text" name="quizname" placeholder="Enter quiz name" required><br>
+                    
+                    <label for="quiz_start">Quiz Start Time</label><br>
+                    <!-- Use datetime-local for combined date and time input -->
+                    <input type="datetime-local" name="quiz_start" required><br>
+                    
+                    <label for="quiz_end">Quiz End Time</label><br>
+                    <input type="datetime-local" name="quiz_end" required><br>
+                    
                     <!-- Hidden fields -->
                     <input type="hidden" name="form_type" value="add_quiz">
                     <input type="hidden" name="selected_chapter" value="{{ selected_chapter }}">
                     <button class="btn btn-primary" type="submit">Add Quiz</button>
                 </form>
+
+
             </div>
 
             <!-- Questions Management Section -->

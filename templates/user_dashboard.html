@@ -55,6 +55,7 @@
                                                         {{ quiz_item.name }} 
                                                         <span>
                                                             <button onclick="window.location.href='{{ url_for('take_quiz', quiz_id=quiz_item.id) }}'" id = "take-quiz-{{quiz_item.id}}"> Take Quiz</button>
+                                                            <p>Quiz starts at: {{ quiz_item.start_time }}</p>
                                                         </span>
                                                     </li>                                                    
                                                 {% endfor %}

@@ -4,19 +4,17 @@
   <meta charset="UTF-8">
   <title>Take Quiz - {{ quiz.name }}</title>
   <script>
-    // Timer script: time_limit is passed from Flask (in seconds)
     var timeLeft = {{ time_limit }};
     function startTimer() {
-    var timerId = setInterval(function() {
+      var timerId = setInterval(function() {
         if(timeLeft <= 0) {
-        clearInterval(timerId);
-        // Auto-submit the form when time runs out
-        document.getElementById("quizForm").submit();
+          clearInterval(timerId);
+          document.getElementById("quizForm").submit();
         } else {
-        document.getElementById("timer").innerHTML = "Time left: " + timeLeft + " seconds";
+          document.getElementById("timer").innerHTML = "Time left: " + timeLeft + " seconds";
         }
-        timeLeft -= 1;
-    }, 1000);
+        timeLeft--;
+      }, 1000);
     }
     window.onload = startTimer;
   </script>

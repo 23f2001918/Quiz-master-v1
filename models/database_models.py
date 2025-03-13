@@ -56,7 +56,9 @@ class quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
-    
+    start_time = db.Column(db.DateTime, nullable=False)  # Quiz start datetime
+    end_time = db.Column(db.DateTime, nullable=False)    # Quiz end datetime
+
     questions = db.relationship('question', backref='quiz', lazy=True)
     scores = db.relationship('score', backref='quiz', lazy=True)
     
