@@ -465,6 +465,26 @@ def take_quiz(quiz_id):
     # GET: Render the quiz attempt page with the questions and time limit.
     return render_template("take_quiz.html", quiz=quiz_obj, questions=questions, time_limit=time_limit)
 
+@app.route('/quiz_history', methods=['GET'])
+@login_required
+def quiz_history():
+    # Query all quiz attempts for the current user by joining the score and quiz tables.
+    user_attempts = db.session.query(score, quiz) \
+        .join(quiz, quiz.id == score.quiz_id) \
+        .filter(score.user_id == current_user.id) \
+        .all()
+    
+    # Calculate summary statistics.
+    total_score = sum([attempt.score for attempt, quiz_obj in user_attempts])
+    attempt_count = len(user_attempts)
+    average_score = total_score / attempt_count if attempt_count > 0 else 0
+
+    return render_template("quiz_history.html", 
+                           user_attempts=user_attempts, 
+                           total_score=total_score, 
+                           attempt_count=attempt_count, 
+                           average_score=average_score)
+
 
 # Logout Route
 @app.route("/logout")

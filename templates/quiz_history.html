@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz History</title>
+  <style>
+    table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    h1, h2, p { text-align: center; }
+    a { display: block; text-align: center; margin: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Quiz History</h1>
+  {% if user_attempts|length == 0 %}
+    <p>You have not attempted any quizzes yet.</p>
+  {% else %}
+    <table>
+      <thead>
+         <tr>
+            <th>Quiz Name</th>
+            <th>Score</th>
+         </tr>
+      </thead>
+      <tbody>
+        {% for attempt, quiz_obj in user_attempts %}
+          <tr>
+            <td>{{ quiz_obj.name }}</td>
+            <td>{{ attempt.score }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <hr>
+    <h2>Summary Report</h2>
+    <p>Total Attempts: {{ attempt_count }}</p>
+    <p>Total Score: {{ total_score }}</p>
+    <p>Average Score: {{ average_score|round(2) }}</p>
+  {% endif %}
+  <a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
