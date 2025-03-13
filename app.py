@@ -1,7 +1,8 @@
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 # Import the app instance along with other objects from your database_models.py
-from models.database_models import app, db, bcrypt, login_manager, User, Admin, subject, chapter, quiz, question
+from models.database_models import app, db, bcrypt, login_manager, User, Admin, subject, chapter, quiz, question, score
+from flask import Flask
 
 @app.route('/', methods=['GET', 'POST'])
 def login_signup():
@@ -415,7 +416,55 @@ def delete():
 @app.route("/user_dashboard")
 @login_required
 def user_dashboard():
-    return render_template("user_dashboard.html", role="user")
+    # Query all subjects; each subject automatically loads its chapters,
+    # and each chapter loads its quizzes (if lazy loading is enabled).
+    all_subjects = subject.query.all()
+    print("All subjects:", all_subjects)
+    return render_template("user_dashboard.html", role="user", subjects=all_subjects)
+
+@app.route('/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def take_quiz(quiz_id):
+    # Get the quiz object; 404 if not found.
+    quiz_obj = quiz.query.get_or_404(quiz_id)
+    print("Quiz object:", quiz_obj)
+    # Retrieve all questions for the quiz.
+    questions = question.query.filter_by(quiz_id=quiz_id).all()
+    
+    # Set a time limit. For example, if your quiz model has a time_duration field,
+    # you can use that; otherwise, use a default (e.g., 60 seconds per question).
+    time_limit = getattr(quiz_obj, 'time_duration', 60 * len(questions))
+    
+    if request.method == 'POST':
+        # Evaluate the submitted answers.
+        score_val = 0
+        feedback = []
+        for ques in questions:
+            # Get the submitted answer for question id 'q_{id}'
+            selected_answer = request.form.get(f"q_{ques.id}")
+            is_correct = (selected_answer == ques.answer)
+            if is_correct:
+                score_val += 1
+            feedback.append({
+                "question": ques.question,
+                "selected": selected_answer,
+                "correct": ques.answer,
+                "result": "Correct" if is_correct else "Incorrect"
+            })
+            print("Marked for question:", ques.id, "is correct?", is_correct)
+        print("Final score:", score_val)
+        
+        # Store the quiz score in the database.
+        new_score = score(score=score_val, user_id=current_user.id, quiz_id=quiz_id)
+        db.session.add(new_score)
+        db.session.commit()
+        
+        # Render a feedback page with details.
+        return render_template("quiz_feedback.html", quiz=quiz_obj, score=score_val, total=len(questions), feedback=feedback)
+    
+    # GET: Render the quiz attempt page with the questions and time limit.
+    return render_template("take_quiz.html", quiz=quiz_obj, questions=questions, time_limit=time_limit)
+
 
 # Logout Route
 @app.route("/logout")

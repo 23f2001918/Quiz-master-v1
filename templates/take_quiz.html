@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Take Quiz - {{ quiz.name }}</title>
+  <script>
+    // Timer script: time_limit is passed from Flask (in seconds)
+    var timeLeft = {{ time_limit }};
+    function startTimer() {
+    var timerId = setInterval(function() {
+        if(timeLeft <= 0) {
+        clearInterval(timerId);
+        // Auto-submit the form when time runs out
+        document.getElementById("quizForm").submit();
+        } else {
+        document.getElementById("timer").innerHTML = "Time left: " + timeLeft + " seconds";
+        }
+        timeLeft -= 1;
+    }, 1000);
+    }
+    window.onload = startTimer;
+  </script>
+</head>
+<body>
+  <h1>{{ quiz.name }}</h1>
+  <div id="timer"></div>
+  <form id="quizForm" action="{{ url_for('take_quiz', quiz_id=quiz.id) }}" method="POST">
+    {% for question in questions %}
+      <div class="question-block">
+        <p><strong>{{ loop.index }}. {{ question.question }}</strong></p>
+        <ul>
+          <li>
+            <input type="radio" name="q_{{ question.id }}" value="{{ question.option1 }}" required>
+            {{ question.option1 }}
+          </li>
+          <li>
+            <input type="radio" name="q_{{ question.id }}" value="{{ question.option2 }}">
+            {{ question.option2 }}
+          </li>
+          <li>
+            <input type="radio" name="q_{{ question.id }}" value="{{ question.option3 }}">
+            {{ question.option3 }}
+          </li>
+          <li>
+            <input type="radio" name="q_{{ question.id }}" value="{{ question.option4 }}">
+            {{ question.option4 }}
+          </li>
+        </ul>
+      </div>
+    {% endfor %}
+    <button type="submit">Submit Quiz</button>
+  </form>
+</body>
+</html>

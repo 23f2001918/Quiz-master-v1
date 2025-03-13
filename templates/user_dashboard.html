@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{role.capitalize()}} Dashboard</title>
+    <title>{{ role.capitalize() }} Dashboard</title>
 </head>
 <body>
-    <header>
-        <h1>Dashboard - {{ role.capitalize() }}</h1>
-    </header>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">Quiz<span>Master</span>{{ role.capitalize() }}</div>
+        <div class="navbar-right">
+            <span>{{ role.capitalize() }}</span>
+            <button><a class="btn btn-outline" href="{{ url_for('logout') }}">Log Out</a></button>
+        </div>
+    </nav>
     <nav>
         <ul>
             <li><a href="#home">Home</a></li>
             <li><a href="#profile">Profile</a></li>
             <li><a href="#settings">Settings</a></li>
-            <li><a href="\">Logout</a></li>
         </ul>
     </nav>
     <main>
@@ -30,9 +34,48 @@
             <h2>Settings</h2>
             <p>Adjust your settings here.</p>
         </section>
+
+        <!-- New Section: Available Subjects and Quizzes -->
+        <section id="available">
+            <h2>Available Subjects and Quizzes</h2>
+            {% if subjects %}
+                {% for subj in subjects %}
+                    <div class="subject">
+                        <h3>{{ subj.name }}</h3>
+                        {% if subj.chapters %}
+                            <ul>
+                                {% for chap in subj.chapters %}
+                                    <li>
+                                        <strong>Chapter: {{ chap.name }}</strong>
+                                        {% if chap.quizzes %}
+                                            <ul>
+                                                {% for quiz_item in chap.quizzes %}
+                                                    <li>
+                                                        {{ quiz_item.name }} 
+                                                        <span>
+                                                            <button onclick="window.location.href='{{ url_for('take_quiz', quiz_id=quiz_item.id) }}'"> Take Quiz</button>
+                                                        </span>
+                                                    </li>                                                    
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>No quizzes available</p>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No chapters available</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No subjects available.</p>
+            {% endif %}
+        </section>
     </main>
     <footer>
-        <p>&copy; 2023 Quiz Master</p>
+        <p>&copy; 2025 Quiz Master</p>
     </footer>
 </body>
 </html>

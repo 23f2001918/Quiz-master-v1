@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Feedback - {{ quiz.name }}</title>
+</head>
+<body>
+  <h1>Quiz: {{ quiz.name }}</h1>
+  <h2>Your Score: {{ score }} out of {{ total }}</h2>
+  <h3>Feedback:</h3>
+  <ol>
+    {% for fb in feedback %}
+      <li>
+        <br><strong>Question:</strong> {{ fb.question }} <br>
+        <strong>Your Answer:</strong> {{ fb.selected }} <br>
+        <strong>Correct Answer:</strong> {{ fb.correct }} <br>
+        <strong>Result:</strong> {{ fb.result }}<br>
+      </li>
+    {% endfor %}
+  </ol>
+  <a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
