@@ -19,6 +19,7 @@
             <li><a href="#home">Home</a></li>
             <li><a href="#profile">Profile</a></li>
             <li><a href="#settings">Settings</a></li>
+            <li><a href={{url_for('search',user_type = 'user')}}>Search for subject or quizzes</a></li>
         </ul>
     </nav>
     <main>
@@ -40,7 +41,7 @@
             <h2>Available Subjects and Quizzes</h2>
             {% if subjects %}
                 {% for subj in subjects %}
-                    <div class="subject">
+                    <div class="subject" id = "subject-{{subj.id}}">
                         <h3>{{ subj.name }}</h3>
                         {% if subj.chapters %}
                             <ul>
@@ -53,7 +54,7 @@
                                                     <li>
                                                         {{ quiz_item.name }} 
                                                         <span>
-                                                            <button onclick="window.location.href='{{ url_for('take_quiz', quiz_id=quiz_item.id) }}'"> Take Quiz</button>
+                                                            <button onclick="window.location.href='{{ url_for('take_quiz', quiz_id=quiz_item.id) }}'" id = "take-quiz-{{quiz_item.id}}"> Take Quiz</button>
                                                         </span>
                                                     </li>                                                    
                                                 {% endfor %}

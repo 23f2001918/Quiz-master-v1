@@ -2,7 +2,19 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 # Import the app instance along with other objects from your database_models.py
 from models.database_models import app, db, bcrypt, login_manager, User, Admin, subject, chapter, quiz, question, score
-from flask import Flask
+from flask import Flask,session
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # Use the session flag to determine which table to query:
+    role = session.get("user_role", "user")  # default to user if not set
+    if role == "admin":
+        return Admin.query.get(int(user_id))
+    else:
+        return User.query.get(int(user_id))
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login_signup():
@@ -12,22 +24,25 @@ def login_signup():
         form_type = request.form.get("form_type")
         print("Form type:", form_type)
         
+        # In your login_signup route (or admin login route)
         if form_type == "login":
             username = request.form.get("username")
             password = request.form.get("password")
-            
-            # Check if the user is an admin (using username field)
-            admin = Admin.query.filter_by(username=username).first()
-            if admin and bcrypt.check_password_hash(admin.password, password):
-                login_user(admin)
+
+            # Try admin first:
+            admin_obj = Admin.query.filter_by(username=username).first()
+            if admin_obj and bcrypt.check_password_hash(admin_obj.password, password):
+                login_user(admin_obj, remember=True)
+                session["user_role"] = "admin"  # store admin flag in session
                 return redirect(url_for("admin_dashboard"))
-            
-            # Check for a regular user (using username field)
-            user = User.query.filter_by(username=username).first()
-            if user and bcrypt.check_password_hash(user.password, password):
-                login_user(user)
+
+            # Then try regular user:
+            user_obj = User.query.filter_by(username=username).first()
+            if user_obj and bcrypt.check_password_hash(user_obj.password, password):
+                login_user(user_obj, remember=True)
+                session["user_role"] = "user"  # store regular user flag
                 return redirect(url_for("user_dashboard"))
-            
+
             flash("Invalid credentials, if new user please signup", "danger")
         
         elif form_type == "signup":
@@ -485,6 +500,40 @@ def quiz_history():
                            attempt_count=attempt_count, 
                            average_score=average_score)
 
+@app.route("/search", methods=["GET"])
+@login_required
+def search():
+    query = request.args.get("q", "")
+    
+    # Determine admin status explicitly.
+    # Option 1: If you have separate models for Admin and User:
+    is_admin = isinstance(current_user, Admin)
+    print("Current user type:", current_user.__class__.__name__)
+    
+    # Option 2: If your User model has a role property, e.g.:
+    # is_admin = (current_user.role == "admin")
+    
+    subjects = []
+    quizzes = []
+    users = []
+    questions = []
+    
+    if query:
+        subjects = subject.query.filter(subject.name.ilike(f"%{query}%")).all()
+        quizzes = quiz.query.filter(quiz.name.ilike(f"%{query}%")).all()
+        # Only search users and questions if the current user is an admin
+        if is_admin:
+            users = User.query.filter(User.username.ilike(f"%{query}%")).all()
+            questions = question.query.filter(question.question.ilike(f"%{query}%")).all()
+    
+    return render_template("search.html", 
+                           query=query, 
+                           subjects=subjects, 
+                           quizzes=quizzes, 
+                           users=users, 
+                           questions=questions, 
+                           is_admin=is_admin)
+    
 
 # Logout Route
 @app.route("/logout")

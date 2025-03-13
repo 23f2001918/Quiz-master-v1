@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search Subjects and Quizzes</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Search Subjects and Quizzes</h1>
+    <form action="{{ url_for('search') }}" method="GET">
+      <input type="text" name="q" placeholder="Enter search term..." value="{{ query or '' }}" required>
+      <button type="submit">Search</button>
+    </form>
+    
+    {% if query %}
+      <!-- Subjects Section -->
+      <div class="result-section">
+        <h2>Subjects Matching "{{ query }}"</h2>
+        {% if subjects %}
+          <ul>
+            {% for subj in subjects %}
+              <li>{{ subj.name }} (ID: {{ subj.id }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-results">No subjects found.</p>
+        {% endif %}
+      </div>
+      
+      <!-- Quizzes Section -->
+      <div class="result-section">
+        <h2>Quizzes Matching "{{ query }}"</h2>
+        {% if quizzes %}
+          <ul>
+            {% for q in quizzes %}
+              <li>{{ q.name }} (ID: {{ q.id }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-results">No quizzes found.</p>
+        {% endif %}
+      </div>
+      
+      {% if is_admin %}
+      <!-- Users Section (admin-only) -->
+      <div class="result-section">
+        <h2>Users Matching "{{ query }}"</h2>
+        {% if users %}
+          <ul>
+            {% for user in users %}
+              <li>{{ user.username }} (ID: {{ user.id }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-results">No users found.</p>
+        {% endif %}
+      </div>
+      
+      <!-- Questions Section (admin-only) -->
+      <div class="result-section">
+        <h2>Questions Matching "{{ query }}"</h2>
+        {% if questions %}
+          <ul>
+            {% for ques in questions %}
+              <li>{{ ques.question }} (ID: {{ ques.id }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-results">No questions found.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</body>
+</html>
