@@ -3,21 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Quiz Feedback - {{ quiz.name }}</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quiz_feedback.css') }}">
 </head>
 <body>
-  <h1>Quiz: {{ quiz.name }}</h1>
-  <h2>Your Score: {{ score }} out of {{ total }}</h2>
-  <h3>Feedback:</h3>
-  <ol>
-    {% for fb in feedback %}
+  <div class="container">
+    <h1>Quiz: {{ quiz.name }}</h1>
+    <h2>Your Score: {{ score }} out of {{ total }}</h2>
+    <h3>Feedback:</h3>
+    <ol>
+      {% for fb in feedback %}
       <li>
-        <br><strong>Question:</strong> {{ fb.question }} <br>
-        <strong>Your Answer:</strong> {{ fb.selected }} <br>
-        <strong>Correct Answer:</strong> {{ fb.correct }} <br>
-        <strong>Result:</strong> {{ fb.result }}<br>
+        <p><strong>Question:</strong> {{ fb.question }}</p>
+        <p><strong>Your Answer:</strong> {{ fb.selected }}</p>
+        <p><strong>Correct Answer:</strong> {{ fb.correct }}</p>
+        <p><strong>Result:</strong> {{ fb.result }}</p>
       </li>
-    {% endfor %}
-  </ol>
-  <a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+      {% endfor %}
+    </ol>
+    <div class="back-link">
+      <a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+    </div>
+  </div>
 </body>
 </html>

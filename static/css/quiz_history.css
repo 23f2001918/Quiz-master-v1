@@ -1,0 +1,64 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #333;
+    padding: 20px;
+  }
+  
+  /* Headings */
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Table styling */
+  table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+  }
+  
+  table, th, td {
+    border: 1px solid #ccc;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: center;
+  }
+  
+  /* Horizontal rule */
+  hr {
+    width: 80%;
+    margin: 20px auto;
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+  
+  /* Link styling */
+  a {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #5cb85c;
+    font-weight: bold;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* No results message */
+  .no-results {
+    text-align: center;
+    color: #888;
+  }
+  

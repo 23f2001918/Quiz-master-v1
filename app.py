@@ -1,6 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
-# Import the app instance along with other objects from your database_models.py
 from models.database_models import app, db, bcrypt, login_manager, User, Admin, subject, chapter, quiz, question, score
 from flask import Flask,session
 import datetime
@@ -108,6 +107,7 @@ def admin_dashboard():
         distinct_quiz_list = [q[0] for q in distinct_quiz]
         
         user_list = get_user_details()
+        
     #for adding new subject
     if request.method == "POST":
         form_type = request.form.get("form_type")
@@ -229,7 +229,7 @@ def admin_dashboard():
             ans = request.form.get("answer")
             
             if selected_quiz and q_text and opt1 and opt2 and opt3 and opt4 and ans:
-                # Assuming selected_quiz is the quiz name; ideally, pass quiz_id.
+                
                 quiz_obj = quiz.query.filter_by(name=selected_quiz).first()
                 if quiz_obj:
                     new_question = question(question=q_text, option1=opt1, option2=opt2,
@@ -253,7 +253,7 @@ def admin_dashboard():
             ans = request.form.get("answer")
             
             if selected_quiz and q_text and opt1 and opt2 and opt3 and opt4 and ans:
-                # Assuming selected_quiz is the quiz name; ideally, pass quiz_id.
+                
                 quiz_obj = quiz.query.filter_by(name=selected_quiz).first()
                 if quiz_obj:
                     new_question = question(question=q_text, option1=opt1, option2=opt2,
@@ -356,7 +356,7 @@ def edit():
         return redirect(url_for('admin_dashboard'))   
     
         
-    # If form_type is not subject_edit, return an error
+
     flash("Invalid request!", "danger")
     return redirect(url_for('admin_dashboard'))  # Ensure a valid response
 
@@ -447,11 +447,11 @@ def delete():
 @app.route("/user_dashboard")
 @login_required
 def user_dashboard():
-    # Query all subjects; each subject automatically loads its chapters,
-    # and each chapter loads its quizzes (if lazy loading is enabled).
     all_subjects = subject.query.all()
+    username = current_user.username  # Get username from the logged-in user
     print("All subjects:", all_subjects)
-    return render_template("user_dashboard.html", role="user", subjects=all_subjects)
+    return render_template("user_dashboard.html", role="user", subjects=all_subjects, username=username)
+
 
 @app.route('/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
@@ -516,14 +516,10 @@ def quiz_history():
 def search():
     query = request.args.get("q", "")
     
-    # Determine admin status explicitly.
-    # Option 1: If you have separate models for Admin and User:
+    # Check if the current user is an admin
     is_admin = isinstance(current_user, Admin)
     print("Current user type:", current_user.__class__.__name__)
-    
-    # Option 2: If your User model has a role property, e.g.:
-    # is_admin = (current_user.role == "admin")
-    
+        
     subjects = []
     quizzes = []
     users = []

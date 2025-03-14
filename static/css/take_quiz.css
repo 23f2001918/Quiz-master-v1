@@ -1,0 +1,83 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body styling */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    color: #333;
+  }
+  
+  /* Main container styling */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Heading */
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Timer styling */
+  .timer {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #d9534f;
+  }
+  
+  /* Question block styling */
+  .question-block {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .question-text {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  /* Options list styling */
+  .options {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .options li {
+    margin-bottom: 8px;
+  }
+  
+  .options label {
+    cursor: pointer;
+  }
+  
+  /* Button styling */
+  .btn {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .btn:hover {
+    background-color: #4cae4c;
+  }
+  

@@ -1,0 +1,212 @@
+/* Reset and basic styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .navbar .logo {
+    font-size: 24px;
+  }
+  
+  .navbar .logo span {
+    color: #5cb85c;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-right span {
+    margin-right: 10px;
+  }
+  
+  .navbar-right a {
+    text-decoration: none;
+    color: #fff;
+  }
+  
+  /* Main container with sidebar and main content */
+  .container {
+    display: flex;
+    margin: 20px;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    margin-right: 20px;
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+  }
+  
+  .sidebar-menu li {
+    margin-bottom: 15px;
+  }
+  
+  .sidebar-menu li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    display: block;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  
+  .sidebar-menu li a:hover,
+  .sidebar-menu li a.active {
+    background: #5cb85c;
+    color: #fff;
+  }
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
+  
+  /* Progress Section */
+  .progress-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .progress-card {
+    background: #5cb85c;
+    color: #fff;
+    padding: 15px;
+    flex: 1;
+    margin-right: 10px;
+    text-align: center;
+    border-radius: 4px;
+  }
+  
+  .progress-card:last-child {
+    margin-right: 0;
+  }
+  
+  .progress-value {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .progress-label {
+    font-size: 14px;
+  }
+  
+  /* Content Sections */
+  .content-section {
+    margin-bottom: 30px;
+  }
+  
+  .section-header {
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .create {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #5cb85c;
+  }
+  
+  /* Forms */
+  .form {
+    margin-bottom: 20px;
+  }
+  
+  .form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form input[type="text"],
+  .form input[type="email"],
+  .form input[type="password"],
+  .form input[type="datetime-local"],
+  .form select,
+  .form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form input:focus,
+  .form textarea:focus,
+  .form select:focus {
+    border-color: #5cb85c;
+    outline: none;
+  }
+  
+  /* Buttons */
+  .btn {
+    background: #5cb85c;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background: #4cae4c;
+  }
+  
+  /* Tables */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .table th {
+    background: #f2f2f2;
+  }
+  
+  /* Empty list message */
+  .empty-list {
+    font-style: italic;
+    color: #888;
+  }  

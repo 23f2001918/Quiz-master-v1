@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
     <title>{{ role.capitalize() }} Dashboard</title>
 </head>
 <body>
@@ -25,7 +26,7 @@
     <main>
         <section id="home">
             <h2>Home</h2>
-            <p>Welcome to the {{ role }} dashboard!</p>
+            <p>Welcome to the {{ role }} dashboard {{  username }}!</p>
         </section>
         <section id="profile">
             <h2>Profile</h2>
@@ -35,7 +36,9 @@
             <h2>Settings</h2>
             <p>Adjust your settings here.</p>
         </section>
-
+        <section id="quiz_history">
+            <a href="{{ url_for('quiz_history') }}">Click here to see the attempted quiz results</a>  
+        </section>
         <!-- New Section: Available Subjects and Quizzes -->
         <section id="available">
             <h2>Available Subjects and Quizzes</h2>
