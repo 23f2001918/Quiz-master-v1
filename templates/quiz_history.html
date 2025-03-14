@@ -6,6 +6,17 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quiz_history.css') }}">
 </head>
 <body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
   <h1>Quiz History</h1>
   {% if user_attempts|length == 0 %}
     <p>You have not attempted any quizzes yet.</p>

@@ -70,6 +70,10 @@ def login_signup():
 @login_required
 def admin_dashboard():
     
+    if session.get("user_role") != "admin":
+        flash("Access denied. Admins only.", "danger")
+        return redirect(url_for("user_dashboard"))
+    
     if request.method == "POST" or request.method == "GET":
         #For the admin dashboard, we will display the total number of subjects, chapters, quizzes, and questions in the database
         
